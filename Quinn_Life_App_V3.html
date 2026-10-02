@@ -1,0 +1,558 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff8200"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Quinn">
+<title>Quinn • Life Dashboard V2</title>
+<style>
+:root{--o:#ff8200;--bg:#f3f4f6;--card:#fff;--ink:#18181b;--muted:#71717a;--line:#e4e4e7}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:90px}
+.hero{background:linear-gradient(145deg,#ff8200,#e96f00);color:#fff;padding:calc(20px + env(safe-area-inset-top)) 18px 22px;border-radius:0 0 28px 28px;box-shadow:0 8px 25px #ff820033}
+.hero .eyebrow{font-size:12px;font-weight:800;letter-spacing:1.4px;opacity:.8}
+.hero h1{font-size:29px;line-height:1.05;margin:7px 0 8px} .hero p{margin:0;opacity:.92;font-size:14px;line-height:1.4}
+.overall{margin-top:18px;background:#ffffff24;padding:13px;border-radius:15px}
+.overalltop{display:flex;justify-content:space-between;font-weight:800;font-size:13px}
+.overallbar{height:9px;background:#ffffff45;border-radius:99px;margin-top:8px;overflow:hidden}
+.overallbar i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:.25s}
+.nav{display:flex;gap:8px;overflow:auto;padding:14px 14px 5px;scrollbar-width:none}
+.nav a{text-decoration:none;color:#555;background:white;padding:9px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 1px 5px #0000000c}
+main{max-width:720px;margin:auto;padding:10px 13px}
+.focus{background:#18181b;color:#fff;border-radius:18px;padding:16px;margin-bottom:14px}
+.focus h3{margin:0 0 9px;color:#ff9d38} .focus input{width:100%;border:0;border-radius:10px;padding:11px;font-size:15px;margin-top:6px}
+.day{background:var(--card);border-radius:20px;padding:16px;margin:0 0 15px;box-shadow:0 3px 15px #0000000b}
+.dayhead{display:flex;align-items:center;justify-content:space-between} h2{font-size:25px;margin:0;color:var(--o)} .dayhead p{margin:2px 0 0;font-size:11px;font-weight:900;letter-spacing:1px;color:#777}
+.ring{width:49px;height:49px;border-radius:50%;display:grid;place-items:center;background:#f3f3f3;border:4px solid #ececec} .pct{font-size:11px;font-weight:900}
+.bar{height:6px;background:#eee;border-radius:99px;margin:12px 0;overflow:hidden} .bar i{height:100%;display:block;width:0;background:var(--o);transition:.25s}
+.task{display:grid;grid-template-columns:26px 78px 1fr;align-items:start;gap:7px;padding:10px 4px;border-top:1px solid #f0f0f0;cursor:pointer}
+.task input{display:none} .box{width:22px;height:22px;border:2px solid #d4d4d8;border-radius:7px;margin-top:1px;position:relative}
+.task input:checked + .box{background:var(--o);border-color:var(--o)} .task input:checked + .box:after{content:"✓";position:absolute;color:white;font-weight:900;left:4px;top:-1px}
+.task:has(input:checked) .txt{opacity:.45;text-decoration:line-through}
+.time{font-size:12px;font-weight:850;padding-top:3px;color:#52525b} .txt b{display:block;font-size:14px} .txt small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:2px}
+.school{border-left:3px solid #ff8200;padding-left:8px} .faith{border-left:3px solid #7c3aed;padding-left:8px} .health{border-left:3px solid #16a34a;padding-left:8px} .relationship{border-left:3px solid #e11d48;padding-left:8px} .project{border-left:3px solid #2563eb;padding-left:8px} .fun{border-left:3px solid #eab308;padding-left:8px}
+.legend{display:flex;gap:7px;flex-wrap:wrap;font-size:11px;margin:10px 0 16px} .legend span{background:#fff;border-radius:99px;padding:7px 9px;font-weight:700}
+.weekly{background:white;border-radius:20px;padding:16px;margin-bottom:15px} .weekly h2{color:#18181b;font-size:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px} .metric{background:#f7f7f8;border-radius:13px;padding:12px} .metric b{font-size:22px;color:var(--o);display:block} .metric span{font-size:11px;color:#666;font-weight:700}
+.notes textarea{width:100%;min-height:70px;border:1px solid #ddd;border-radius:12px;padding:11px;font:inherit;margin:5px 0 10px}
+.actions{display:flex;gap:8px} button{border:0;border-radius:12px;padding:12px;font-weight:850;cursor:pointer} .reset{background:#18181b;color:#fff} .today{background:var(--o);color:#fff}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:#ffffffee;backdrop-filter:blur(12px);border-top:1px solid #eee;padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;z-index:5}
+.bottom a{font-size:11px;text-decoration:none;color:#555;font-weight:800;text-align:center} .bottom strong{display:block;font-size:19px;margin-bottom:1px}
+@media(min-width:700px){.task{grid-template-columns:28px 105px 1fr}}
+</style>
+
+<style>
+body{padding-bottom:92px}
+header{border-radius:0 0 28px 28px!important;padding-top:calc(24px + env(safe-area-inset-top))!important}
+header h1:before{content:"MY JUNIOR YEAR • UTK";display:block;font-size:11px;letter-spacing:1.5px;opacity:.78;margin-bottom:8px}
+header h1{font-size:29px!important}
+.day{border-radius:22px!important}
+.day h2{font-size:27px!important}
+.check{min-height:44px}
+.task,.row{touch-action:manipulation}
+.app-install{max-width:720px;margin:14px auto 0;padding:0 14px}
+.app-install div{background:#18181b;color:#fff;border-radius:18px;padding:15px;font-size:13px;line-height:1.45;box-shadow:0 3px 12px #0002}
+.app-install b{color:#ff9b38}
+.bottom{padding-bottom:calc(8px + env(safe-area-inset-bottom))!important}
+.quick-home{position:fixed;right:16px;bottom:82px;width:52px;height:52px;border-radius:50%;border:0;background:#ff8200;color:#fff;font-size:23px;box-shadow:0 5px 18px #0003;z-index:7}
+@media (display-mode:standalone){.app-install{display:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+ <div class="eyebrow">JUNIOR YEAR • UTK</div>
+ <h1>Quinn's Life Dashboard</h1>
+ <p>School. Faith. Relationship. Health. Projects. Fun.<br>Structure your week without scheduling your whole life.</p>
+ <div class="overall"><div class="overalltop"><span>WEEKLY PROGRESS</span><span id="overallPct">0%</span></div><div class="overallbar"><i id="overallBar"></i></div></div>
+</header>
+<div class="nav"><a href="#monday">Mon</a><a href="#tuesday">Tue</a><a href="#wednesday">Wed</a><a href="#thursday">Thu</a><a href="#friday">Fri</a><a href="#saturday">Sat</a><a href="#sunday">Sun</a></div>
+
+<div class="app-install"><div><b>📱 Make this your own mini app:</b> open this file in Safari, tap the Share button, choose <b>Add to Home Screen</b>, and name it <b>Quinn</b>. Your checkmarks and weekly goals stay saved on that device.</div></div>
+<main>
+ <section class="focus">
+  <h3>THIS WEEK</h3>
+  <label>Main goal<input id="goal" placeholder="What would make this week a win?"></label>
+  <label>Main project<input id="project" placeholder="Flipping, TikTok, career, tracker..."></label>
+  <label>Something fun<input id="fun" placeholder="What are you looking forward to?"></label>
+ </section>
+ <div class="legend"><span>🟧 School</span><span>🟪 Faith</span><span>🟩 Active</span><span>❤️ Girlfriend</span><span>🟦 Projects</span><span>🟨 Fun</span></div>
+ 
+    <section class="day" id="monday">
+      <div class="dayhead">
+        <div><h2>Monday</h2><p>BUILD MOMENTUM</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="monday-0">
+          <span class="box"></span>
+          <span class="time">9:00 AM</span>
+          <span class="txt"><b>Morning reset</b><small>Wake up • water • breakfast • get ready</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="monday-1">
+          <span class="box"></span>
+          <span class="time">9:30 AM</span>
+          <span class="txt"><b>Faith</b><small>Bible + prayer • choose 3 wins for today</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="monday-2">
+          <span class="box"></span>
+          <span class="time">11:30 AM</span>
+          <span class="txt"><b>Sociology 110</b><small>Class until 12:20 PM</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="monday-3">
+          <span class="box"></span>
+          <span class="time">12:20 PM</span>
+          <span class="txt"><b>Lunch</b><small>Eat + decompress</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="monday-4">
+          <span class="box"></span>
+          <span class="time">1:15 PM</span>
+          <span class="txt"><b>Information Management</b><small>60–90 min independent work</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="monday-5">
+          <span class="box"></span>
+          <span class="time">3:15 PM</span>
+          <span class="txt"><b>Study block</b><small>Closest deadline/test first</small></span>
+        </label>
+        <label class="task health" data-cat="health">
+          <input type="checkbox" data-key="monday-6">
+          <span class="box"></span>
+          <span class="time">4:30 PM</span>
+          <span class="txt"><b>Basketball / activity</b><small>Preferred basketball day</small></span>
+        </label>
+        <label class="task fun" data-cat="fun">
+          <input type="checkbox" data-key="monday-7">
+          <span class="box"></span>
+          <span class="time">6:00 PM</span>
+          <span class="txt"><b>Free evening</b><small>Dinner • friends • relax</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="monday-8">
+          <span class="box"></span>
+          <span class="time">9:00 PM</span>
+          <span class="txt"><b>Girlfriend</b><small>Quality FaceTime</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="monday-9">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Close the day</b><small>Prayer + quick Tuesday check</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="tuesday">
+      <div class="dayhead">
+        <div><h2>Tuesday</h2><p>HANDLE BUSINESS</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="tuesday-0">
+          <span class="box"></span>
+          <span class="time">7:15 AM</span>
+          <span class="txt"><b>Morning</b><small>Breakfast + get ready</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="tuesday-1">
+          <span class="box"></span>
+          <span class="time">7:45 AM</span>
+          <span class="txt"><b>Faith</b><small>Short prayer + intention</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="tuesday-2">
+          <span class="box"></span>
+          <span class="time">8:00 AM</span>
+          <span class="txt"><b>Business Law 301</b><small>Class until 8:50</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="tuesday-3">
+          <span class="box"></span>
+          <span class="time">9:45 AM</span>
+          <span class="txt"><b>Finance 301</b><small>Online until 11:00</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="tuesday-4">
+          <span class="box"></span>
+          <span class="time">11:00 AM</span>
+          <span class="txt"><b>Lunch / reset</b><small>Take a real break</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="tuesday-5">
+          <span class="box"></span>
+          <span class="time">12:00 PM</span>
+          <span class="txt"><b>Deep school block</b><small>60–90 min priority homework/study</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="tuesday-6">
+          <span class="box"></span>
+          <span class="time">2:15 PM</span>
+          <span class="txt"><b>Optional school block</b><small>Management / IM / catch-up</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="tuesday-7">
+          <span class="box"></span>
+          <span class="time">4:10 PM</span>
+          <span class="txt"><b>Business Administration 331</b><small>Class until 5:00</small></span>
+        </label>
+        <label class="task health" data-cat="health">
+          <input type="checkbox" data-key="tuesday-8">
+          <span class="box"></span>
+          <span class="time">7:00 PM</span>
+          <span class="txt"><b>Free / active</b><small>Walk, activity, friends or rest</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="tuesday-9">
+          <span class="box"></span>
+          <span class="time">8:00 PM</span>
+          <span class="txt"><b>Girlfriend / fun</b><small>FaceTime or relax</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="tuesday-10">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Faith + Wednesday check</b><small>Short prayer</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="wednesday">
+      <div class="dayhead">
+        <div><h2>Wednesday</h2><p>BUILD SOMETHING</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="wednesday-0">
+          <span class="box"></span>
+          <span class="time">9:00 AM</span>
+          <span class="txt"><b>Morning</b><small>Breakfast + easy start</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="wednesday-1">
+          <span class="box"></span>
+          <span class="time">9:30 AM</span>
+          <span class="txt"><b>Faith</b><small>Bible/prayer + choose ONE project</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="wednesday-2">
+          <span class="box"></span>
+          <span class="time">11:30 AM</span>
+          <span class="txt"><b>Sociology 110</b><small>Class until 12:20</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="wednesday-3">
+          <span class="box"></span>
+          <span class="time">12:20 PM</span>
+          <span class="txt"><b>Lunch</b><small>Eat + reset</small></span>
+        </label>
+        <label class="task project" data-cat="project">
+          <input type="checkbox" data-key="wednesday-4">
+          <span class="box"></span>
+          <span class="time">1:00 PM</span>
+          <span class="txt"><b>Project Deep Work</b><small>90 min: flipping, TikTok, tracker, career, etc.</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="wednesday-5">
+          <span class="box"></span>
+          <span class="time">3:00 PM</span>
+          <span class="txt"><b>School maintenance</b><small>Quick assignment/prep block</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="wednesday-6">
+          <span class="box"></span>
+          <span class="time">4:05 PM</span>
+          <span class="txt"><b>Management 331</b><small>Class until 5:20</small></span>
+        </label>
+        <label class="task fun" data-cat="fun">
+          <input type="checkbox" data-key="wednesday-7">
+          <span class="box"></span>
+          <span class="time">7:00 PM</span>
+          <span class="txt"><b>Adventure window</b><small>Friends • campus • activity • something different</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="wednesday-8">
+          <span class="box"></span>
+          <span class="time">9:00 PM</span>
+          <span class="txt"><b>Girlfriend</b><small>FaceTime / relax</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="wednesday-9">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Reflection</b><small>Prayer + note today's progress</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="thursday">
+      <div class="dayhead">
+        <div><h2>Thursday</h2><p>FINISH STRONG + MOVE</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="thursday-0">
+          <span class="box"></span>
+          <span class="time">7:15 AM</span>
+          <span class="txt"><b>Morning</b><small>Breakfast + get ready</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="thursday-1">
+          <span class="box"></span>
+          <span class="time">7:45 AM</span>
+          <span class="txt"><b>Faith</b><small>Prayer / intention</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="thursday-2">
+          <span class="box"></span>
+          <span class="time">8:00 AM</span>
+          <span class="txt"><b>Business Law 301</b><small>Class until 8:50</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="thursday-3">
+          <span class="box"></span>
+          <span class="time">9:45 AM</span>
+          <span class="txt"><b>Finance 301</b><small>Online until 11:00</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="thursday-4">
+          <span class="box"></span>
+          <span class="time">12:00 PM</span>
+          <span class="txt"><b>Deep school block</b><small>60–90 min focused work</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="thursday-5">
+          <span class="box"></span>
+          <span class="time">1:30 PM</span>
+          <span class="txt"><b>Independent course work</b><small>Management or IM if needed</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="thursday-6">
+          <span class="box"></span>
+          <span class="time">4:10 PM</span>
+          <span class="txt"><b>Business Administration 331</b><small>Class until 5:00</small></span>
+        </label>
+        <label class="task health" data-cat="health">
+          <input type="checkbox" data-key="thursday-7">
+          <span class="box"></span>
+          <span class="time">5:15 PM</span>
+          <span class="txt"><b>Pickleball / activity</b><small>Preferred pickleball day</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="thursday-8">
+          <span class="box"></span>
+          <span class="time">8:00 PM</span>
+          <span class="txt"><b>Free evening</b><small>Girlfriend • friends • sports • relax</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="thursday-9">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Friday check</b><small>Know what must be finished tomorrow</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="friday">
+      <div class="dayhead">
+        <div><h2>Friday</h2><p>FINISH, THEN LIVE</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="friday-0">
+          <span class="box"></span>
+          <span class="time">7:15 AM</span>
+          <span class="txt"><b>Morning</b><small>Get ready</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="friday-1">
+          <span class="box"></span>
+          <span class="time">8:00 AM</span>
+          <span class="txt"><b>IM 242 Lab</b><small>Class until 8:50</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="friday-2">
+          <span class="box"></span>
+          <span class="time">9:00 AM</span>
+          <span class="txt"><b>IM follow-up</b><small>Finish small tasks while fresh</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="friday-3">
+          <span class="box"></span>
+          <span class="time">11:30 AM</span>
+          <span class="txt"><b>Sociology 110</b><small>Class until 12:20</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="friday-4">
+          <span class="box"></span>
+          <span class="time">12:20 PM</span>
+          <span class="txt"><b>Lunch</b><small>Reset</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="friday-5">
+          <span class="box"></span>
+          <span class="time">1:00 PM</span>
+          <span class="txt"><b>Weekend-clear block</b><small>Finish anything that would hang over weekend</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="friday-6">
+          <span class="box"></span>
+          <span class="time">2:30 PM</span>
+          <span class="txt"><b>Canvas check</b><small>If clear, school is DONE</small></span>
+        </label>
+        <label class="task fun" data-cat="fun">
+          <input type="checkbox" data-key="friday-7">
+          <span class="box"></span>
+          <span class="time">3:00 PM+</span>
+          <span class="txt"><b>Friday is yours</b><small>Friends • girlfriend • sports • UT • go out • relax</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="friday-8">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Gratitude</b><small>Quick prayer • no productivity guilt</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="saturday">
+      <div class="dayhead">
+        <div><h2>Saturday</h2><p>MAKE COLLEGE MEMORABLE</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="saturday-0">
+          <span class="box"></span>
+          <span class="time">Morning</span>
+          <span class="txt"><b>Slow start</b><small>Sleep in reasonably • breakfast</small></span>
+        </label>
+        <label class="task health" data-cat="health">
+          <input type="checkbox" data-key="saturday-1">
+          <span class="box"></span>
+          <span class="time">Late morning</span>
+          <span class="txt"><b>Move</b><small>Pickleball • basketball • gym • outdoors</small></span>
+        </label>
+        <label class="task project" data-cat="project">
+          <input type="checkbox" data-key="saturday-2">
+          <span class="box"></span>
+          <span class="time">12:00 PM</span>
+          <span class="txt"><b>Optional project</b><small>Up to 90 min only if you want to</small></span>
+        </label>
+        <label class="task fun" data-cat="fun">
+          <input type="checkbox" data-key="saturday-3">
+          <span class="box"></span>
+          <span class="time">Afternoon</span>
+          <span class="txt"><b>Experience</b><small>Football • friends • hike • campus • road trip</small></span>
+        </label>
+        <label class="task fun" data-cat="fun">
+          <input type="checkbox" data-key="saturday-4">
+          <span class="box"></span>
+          <span class="time">Evening</span>
+          <span class="txt"><b>Make a memory</b><small>Social plans • date • restaurant • spontaneous plan</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="saturday-5">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Gratitude</b><small>Brief faith check-in</small></span>
+        </label></div>
+    </section>
+    <section class="day" id="sunday">
+      <div class="dayhead">
+        <div><h2>Sunday</h2><p>LORD + RESET</p></div>
+        <div class="ring"><span class="pct">0%</span></div>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="tasks">
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="sunday-0">
+          <span class="box"></span>
+          <span class="time">Morning</span>
+          <span class="txt"><b>Lord</b><small>Church/worship or longer intentional faith time</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="sunday-1">
+          <span class="box"></span>
+          <span class="time">Late morning</span>
+          <span class="txt"><b>Slow down</b><small>Breakfast/lunch + rest</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="sunday-2">
+          <span class="box"></span>
+          <span class="time">Afternoon</span>
+          <span class="txt"><b>Recharge</b><small>Girlfriend • friends • sports • walk • family</small></span>
+        </label>
+        <label class="task school" data-cat="school">
+          <input type="checkbox" data-key="sunday-3">
+          <span class="box"></span>
+          <span class="time">4:00 PM</span>
+          <span class="txt"><b>Optional school prep</b><small>Only if Monday would otherwise be stressful</small></span>
+        </label>
+        <label class="task project" data-cat="project">
+          <input type="checkbox" data-key="sunday-4">
+          <span class="box"></span>
+          <span class="time">5:00 PM</span>
+          <span class="txt"><b>Weekly Reset</b><small>Canvas • tests • assignments • money • projects</small></span>
+        </label>
+        <label class="task life" data-cat="life">
+          <input type="checkbox" data-key="sunday-5">
+          <span class="box"></span>
+          <span class="time">5:30 PM</span>
+          <span class="txt"><b>Plan the week</b><small>Pick activity windows + main project goal</small></span>
+        </label>
+        <label class="task relationship" data-cat="relationship">
+          <input type="checkbox" data-key="sunday-6">
+          <span class="box"></span>
+          <span class="time">Evening</span>
+          <span class="txt"><b>Relationship + rest</b><small>Dinner • FaceTime • relax</small></span>
+        </label>
+        <label class="task faith" data-cat="faith">
+          <input type="checkbox" data-key="sunday-7">
+          <span class="box"></span>
+          <span class="time">Before bed</span>
+          <span class="txt"><b>Faith</b><small>Prayer: What would make next week a win?</small></span>
+        </label></div>
+    </section>
+ <section class="weekly">
+  <h2>Weekly Scoreboard</h2>
+  <div class="grid">
+   <div class="metric"><b id="schoolN">0</b><span>SCHOOL TASKS DONE</span></div>
+   <div class="metric"><b id="faithN">0</b><span>FAITH MOMENTS</span></div>
+   <div class="metric"><b id="healthN">0</b><span>ACTIVE BLOCKS</span></div>
+   <div class="metric"><b id="projectN">0</b><span>PROJECT BLOCKS</span></div>
+  </div>
+  <div class="notes">
+   <h3>Sunday Reflection</h3>
+   <textarea id="best" placeholder="Best thing I did this week..."></textarea>
+   <textarea id="improve" placeholder="One thing I want to improve next week..."></textarea>
+  </div>
+  <div class="actions"><button class="reset" onclick="resetWeek()">Reset Week</button><button class="today" onclick="goToday()">Jump to Today</button></div>
+ </section>
+</main>
+<nav class="bottom">
+ <a href="#monday"><strong>🎓</strong>Week</a>
+ <a href="#wednesday"><strong>🚀</strong>Projects</a>
+ <a href="#saturday"><strong>🎉</strong>Fun</a>
+ <a href="#sunday"><strong>✝️</strong>Reset</a>
+</nav>
+<script>
+const boxes=[...document.querySelectorAll('input[type=checkbox]')];
+const texts=[...document.querySelectorAll('#goal,#project,#fun,#best,#improve')];
+boxes.forEach(b=>{const k='qv2:'+b.dataset.key;b.checked=localStorage.getItem(k)==='1';b.onchange=()=>{localStorage.setItem(k,b.checked?'1':'0');update()}});
+texts.forEach(x=>{x.value=localStorage.getItem('qv2:text:'+x.id)||'';x.oninput=()=>localStorage.setItem('qv2:text:'+x.id,x.value)});
+function update(){
+ let done=boxes.filter(b=>b.checked).length, total=boxes.length, pct=Math.round(done/total*100);
+ document.getElementById('overallPct').textContent=pct+'%';document.getElementById('overallBar').style.width=pct+'%';
+ document.querySelectorAll('.day').forEach(d=>{let bs=[...d.querySelectorAll('input[type=checkbox]')], n=bs.filter(b=>b.checked).length,p=Math.round(n/bs.length*100);d.querySelector('.pct').textContent=p+'%';d.querySelector('.bar i').style.width=p+'%';});
+ ['school','faith','health','project'].forEach(c=>document.getElementById(c+'N').textContent=document.querySelectorAll('.task.'+c+' input:checked').length);
+}
+function resetWeek(){if(confirm('Start a fresh week? This clears all checks and weekly notes.')){boxes.forEach(b=>{b.checked=false;localStorage.removeItem('qv2:'+b.dataset.key)});texts.forEach(x=>{x.value='';localStorage.removeItem('qv2:text:'+x.id)});update()}}
+function goToday(){let names=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];document.getElementById(names[new Date().getDay()]).scrollIntoView({behavior:'smooth'})}
+update();
+</script>
+<button class="quick-home" onclick="goToday()" aria-label="Jump to today">☀️</button></body></html>
